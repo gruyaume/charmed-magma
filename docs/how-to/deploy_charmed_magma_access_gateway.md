@@ -19,37 +19,40 @@
 
 ## Install Magma Access Gateway
 
-### Option 1: Using DHCP network configuration
+=== "Option 1: DHCP network configuration"
+    
+    Deploy Magma Access Gateway:
+    ``` bash
+    juju deploy magma-access-gateway-operator --config sgi=enp0s1 --config s1=enp0s2
+    ```
+    
+    !!! info
+        The interface names will need to be adjusted based on your specific machine.
 
-Deploy Magma Access Gateway:
 
-```bash
-juju deploy magma-access-gateway-operator --config sgi=enp0s1 --config s1=enp0s2
-```
+=== "Option 2: Static network configuration"
 
-> The interface names will need to be adjusted based on your specific machine.
+    Create a file called `agw_config.yaml` that contains the following content:
 
-### Option 2: Using static network configuration
+    ``` yaml
+    ---
+    magma-access-gateway-operator:
+      sgi: enp0s1
+      sgi-ipv4-address: 192.168.0.2/24
+      sgi-ipv4-gateway: 192.168.0.1
+      sgi-ipv6-address: fd7d:3797:378b:a502::2/64
+      sgi-ipv6-gateway: fd7d:3797:378b:a502::1
+      s1: enp0s2
+      s1-ipv4-address: 192.168.1.2/24
+      s1-ipv6-address: fd7d:3797:378b:a503::2/64
+      dns: '["8.8.8.8", "208.67.222.222"]'
+    ```
+    
+    Deploy Magma Access Gateway:
 
-Create a file called `agw_config.yaml` that contains the following content. Make sure you change
-the interface names and addresses to the one appropriate to your network.
+    ```bash
+    juju deploy magma-access-gateway-operator --config agw_config.yaml
+    ```
 
-```yaml
----
-magma-access-gateway-operator:
-  sgi: enp0s1
-  sgi-ipv4-address: 192.168.0.2/24
-  sgi-ipv4-gateway: 192.168.0.1
-  sgi-ipv6-address: fd7d:3797:378b:a502::2/64
-  sgi-ipv6-gateway: fd7d:3797:378b:a502::1
-  s1: enp0s2
-  s1-ipv4-address: 192.168.1.2/24
-  s1-ipv6-address: fd7d:3797:378b:a503::2/64
-  dns: '["8.8.8.8", "208.67.222.222"]'
-```
-
-Deploy Magma Access Gateway:
-
-```bash
-juju deploy magma-access-gateway-operator --config agw_config.yaml
-```
+    !!! info
+        The interface names and IP addresses will need to be adjusted based on your specific machine.

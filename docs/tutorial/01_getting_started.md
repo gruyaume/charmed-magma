@@ -1,4 +1,4 @@
-# Getting Started
+# 1. Getting Started
 
 This tutorial has been written to work on a Ubuntu 20.04 computer with at least 16 GB of RAM, 10 
 CPU cores and 100 GB of storage.

@@ -5,7 +5,9 @@
 **Magma** is an open source 4G and 5G core network. Use it to operate your own private mobile 
 network. **Charmed Magma** is a distribution of Magma published by Canonical built 
 to work with [Juju](https://juju.is/). Charmed Magma is the easiest way to operate Magma. It provides the simplest 
-setup, integration and lifecycle management options. **[Get started here](tutorial/overview.md)!**
+setup, integration and lifecycle management options.
+
+[Get started here](tutorial/overview.md){ .md-button }
 
 ## More about Magma
 
@@ -18,7 +20,7 @@ Magma is an open-source software platform that gives network operators an open, 
 
 To learn more about Magma, visit the official [website](https://magmacore.org/).
 
-## Why Charmed Magma
+## Why Charmed Magma?
 
 - **Works on all clouds**: Charmed Magma is not opinionated about your choice of cloud. It can also 
 run on your personnal computer.

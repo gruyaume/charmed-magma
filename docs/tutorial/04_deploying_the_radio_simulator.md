@@ -1,3 +1,3 @@
-# Deploying a radio simulator
+# 4. Deploying a radio simulator
 
 TODO
