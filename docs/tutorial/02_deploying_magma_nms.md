@@ -1,4 +1,4 @@
-# Deploying Magma's network management software
+# 2. Deploying Magma's network management software
 
 ## Bootstrapping a Juju controller
 

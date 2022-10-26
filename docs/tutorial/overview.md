@@ -22,4 +22,4 @@ and a cellphone from the [srsRAN](https://www.srslte.com/) project.
 3. [Deploying the 4G core](03_deploying_the_4g_core.md)
 4. [Deploying the radio simulator](04_deploying_the_radio_simulator.md)
 5. [Simulating user traffic](05_simulating_user_traffic.md)
-5. [Destroying the environment](06_destroying_the_environment.md)
+6. [Destroying the environment](06_destroying_the_environment.md)

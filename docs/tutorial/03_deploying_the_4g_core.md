@@ -1,4 +1,4 @@
-# Deploying the 4G core
+# 3. Deploying the 4G core
 
 ## Bootstrapping a new Juju controller
 

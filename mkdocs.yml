@@ -20,6 +20,8 @@ nav:
 
 theme:
   name: material
+  logo: images/logo.png
+  favicon: images/logo.png
   icon:
     admonition:
       note: octicons/tag-16
@@ -36,12 +38,17 @@ theme:
       quote: octicons/quote-16
   features:
     - navigation.expand
+    - content.tabs.link
 
 markdown_extensions:
+  - attr_list
   - pymdownx.emoji
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
 
 extra_css:
   - stylesheets/extra.css
