@@ -1,4 +1,4 @@
-![Magma](images/magma-logo-purple.svg){ width="300" }
+<a href="url"><img src="docs/images/magma-logo-purple.svg" width="300" ></a>
 
 **Magma** is an open source 4G and 5G core network. Use it to operate your own private mobile 
 network. Magma enables better connectivity by:
@@ -22,4 +22,4 @@ run on your personnal computer.
 standard monitoring tools.
 - **Automation**: Charmed Magma automates the initial setup and most operations.
 
-[Get started here](tutorial/overview.md){ .md-button }
+[Get started here](tutorial/overview.md)
