@@ -2,19 +2,34 @@
 
 ## Bootstrapping a Juju controller
 
-Bootstrap a Juju controller on the Kubernetes instance we just created:
+Add the kubernetes cluster to Juju's list of known clouds:
 
 ```bash
-ubuntu@host:~$ juju add-k8s magma-orchestrator-k8s --client
-ubuntu@host:~$ juju bootstrap magma-orchestrator-k8s
-ubuntu@host:~$ juju add-model magma-orchestrator
+juju add-k8s magma-orchestrator-k8s --client
+```
+
+Bootstrap a Juju controller:
+```bash
+juju bootstrap magma-orchestrator-k8s
+```
+
+Add a Juju model:
+
+```bash
+juju add-model magma-orchestrator
 ```
 
 ## Deploying Magma Orchestrator
 
-From your Ubuntu machine, create an `overlay.yaml` file that contains the following content:
+Create a file called `overlay.yaml`:
 
-```yaml
+```bash
+touch overlay.yaml
+```
+
+Place the following content into the file:
+
+```yaml title="overlay.yaml"
 applications:
   orc8r-certifier:
     options:
@@ -31,7 +46,7 @@ applications:
 Deploy Magma Orchestrator:
 
 ```bash
-ubuntu@host:~$ juju deploy magma-orc8r --overlay overlay.yaml --trust --channel=beta
+juju deploy magma-orc8r --overlay overlay.yaml --trust --channel=beta
 ```
 
 You can see the deployment's status by running `juju status`. The deployment is completed when 
@@ -88,53 +103,119 @@ tls-certificates-operator/0*      active    idle   10.1.50.121
 
 ## Getting Access to Magma Orchestrator
 
-Retrieve the PFX package and password that contains the certificates to authenticate against 
-Magma Orchestrator:
+Retrieve the PFX package that contains the certificates to authenticate against Magma Orchestrator.
+The pfx package will be copied to your current working directory. 
 
 ```bash
-ubuntu@host:~$ juju scp --container="magma-orc8r-certifier" orc8r-certifier/0:/var/opt/magma/certs/admin_operator.pfx admin_operator.pfx
-ubuntu@host:~$ juju run-action orc8r-certifier/leader get-pfx-package-password --wait
+juju scp --container="magma-orc8r-certifier" orc8r-certifier/0:/var/opt/magma/certs/admin_operator.pfx admin_operator.pfx
 ```
 
-The pfx package was copied to your current working directory. If you are using Google Chrome, 
-navigate to `chrome://settings/certificates?search=https`, click on Import, select 
-the `admin_operator.pfx` package that we just copied and write in the password that you received.
+Retrieve the PFX package's password:
 
-> **SHOW PICTURE OF HOW THIS IS LOADED IN GOOGLE CHROME**  # TODO
+```bash
+juju run-action orc8r-certifier/leader get-pfx-package-password --wait
+```
+
+The output should look like so:
+
+```bash
+ubuntu@host:~$ juju run-action orc8r-certifier/leader get-pfx-package-password --wait
+unit-orc8r-certifier-0:
+  UnitId: orc8r-certifier/0
+  id: "8"
+  results:
+    password: wufoaMzEU7bg
+  status: completed
+  timing:
+    completed: 2022-10-27 14:15:07 +0000 UTC
+    enqueued: 2022-10-27 14:15:05 +0000 UTC
+    started: 2022-10-27 14:15:06 +0000 UTC
+```
+
+If you are using Google Chrome, navigate to `chrome://settings/certificates?search=https`, click on 
+Import, select the `admin_operator.pfx` package that we just copied and write in the password that you received.
 
 ## Setupping DNS
 
 Retrieve the list of services that need to be exposed:
 
 ```bash
-ubuntu@host:~$ juju run-action orc8r-orchestrator/leader get-load-balancer-services --wait
+juju run-action orc8r-orchestrator/leader get-load-balancer-services --wait
 ```
 
-In your host, create A records for the following Kubernetes services:  # TODO (and also must be added to agw)
-
-| Address                                | Hostname                              | 
-|----------------------------------------|---------------------------------------|
-| `<orc8r-bootstrap-nginx External IP>`  | `bootstrapper-controller.awesome.com` | 
-| `<orc8r-nginx-proxy External IP>`      | `api.awesome.com`                     | 
-| `<orc8r-clientcert-nginx External IP>` | `controller.awesome.com`              | 
-| `<nginx-proxy External IP>`            | `*.nms.awesome.com`                   | 
-
-## Offering an application endpoint
-
-Offer an application endpoint that we will use later for our network core to 
-relate to our orchestrator:
+The result should look like so:
 
 ```bash
-ubuntu@host:~$ juju offer orc8r-nginx:orchestrator
+ubuntu@host:~$ juju run-action orc8r-orchestrator/leader get-load-balancer-services --wait
+unit-orc8r-orchestrator-0:
+  UnitId: orc8r-orchestrator/0
+  id: "4"
+  results:
+    nginx-proxy: 10.0.1.1
+    orc8r-bootstrap-nginx: 10.0.1.3
+    orc8r-clientcert-nginx: 10.0.1.4
+    orc8r-nginx-proxy: 10.0.1.2
+  status: completed
+  timing:
+    completed: 2022-10-27 13:53:38 +0000 UTC
+    enqueued: 2022-10-27 13:53:37 +0000 UTC
+    started: 2022-10-27 13:53:37 +0000 UTC
 ```
+
+At this point, we have Orchestrator up and running and available on private IP addresses. We will
+now create entries in your `/etc/hosts` file so that you can reach Magma Orchestrator via domain
+names. Here replace the IP addresses with the one that you received:
+
+```bash
+echo "10.0.1.2  api.awesome.com" >> /etc/hosts
+echo "10.0.1.3  bootstrapper-controller.awesome.com" >> /etc/hosts
+echo "10.0.1.4  controller.awesome.com" >> /etc/hosts
+echo "10.0.1.1  master.nms.awesome.com" >> /etc/hosts
+echo "10.0.1.1  magma-test.nms.awesome.com" >> /etc/hosts
+```
+
+!!! tip
+
+    Make sure to follow the corresponding IP/hostname scheme:
+
+    | Address                                | Hostname                              | 
+    |----------------------------------------|---------------------------------------|
+    | `<orc8r-bootstrap-nginx External IP>`  | `bootstrapper-controller.awesome.com` | 
+    | `<orc8r-nginx-proxy External IP>`      | `api.awesome.com`                     | 
+    | `<orc8r-clientcert-nginx External IP>` | `controller.awesome.com`              | 
+    | `<nginx-proxy External IP>`            | `*.nms.awesome.com`                   | 
+
+Now, navigate to `https://master.nms.awesome.com`, you should receive a warning because we are
+using self-signed-certificates, click on "Proceed".
 
 ## Verifying the deployment
 
 Get the master organization's username and password:
 
 ```bash
-ubuntu@host:~$ juju run-action nms-magmalte/leader get-master-admin-credentials --wait
+juju run-action nms-magmalte/leader get-master-admin-credentials --wait
 ```
+
+Your result should look like so:
+
+```bash
+ubuntu@host:~$ juju run-action nms-magmalte/leader get-master-admin-credentials --wait
+unit-nms-magmalte-0:
+  UnitId: nms-magmalte/0
+  id: "6"
+  results:
+    admin-password: oTKcM6G9ylG9
+    admin-username: admin@juju.com
+  status: completed
+  timing:
+    completed: 2022-10-27 14:13:43 +0000 UTC
+    enqueued: 2022-10-27 14:13:41 +0000 UTC
+    started: 2022-10-27 14:13:43 +0000 UTC
+```
+
+!!! note
+
+    Your password will be different from the one here
 
 Confirm successful deployment by visiting `https://master.nms.awesome.com` and logging in
 with the `admin-username` and `admin-password` outputted here.
